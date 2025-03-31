@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Fetch File</title>
+    <link rel="stylesheet" href="../css/images.css">
+    <script src="../../security/Main.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Upload and Fetch File</h2>
+
+        <!-- Upload File -->
+        <label for="file" class="custom-file-upload">
+            Choose File
+        </label>
+        <input id="file" type="file" accept="image/*" onchange="previewFile()">
+
+        <div class="preview">
+            <img id="image-preview" src="#" alt="Image Preview">
+        </div>
+
+        <input type="number" id="marks" placeholder="Enter Marks" required>
+        
+        <select id="std" required>
+            <option value="">Select Standard</option>
+        </select>
+        
+        <select id="medium" required>
+            <option value="">Select Medium</option>
+        </select>
+        
+        <select id="subject" required>
+            <option value="">Select Subject</option>
+        </select>
+        
+        <select id="chapterName" required>
+            <option value="">Select Chapter</option>
+        </select>
+        
+        <input type="text" id="canswer" placeholder="Enter Correct Answer" required>
+
+        <select id="type" required>
+            <option value="">Select Type</option>
+            <option value="mcq">MCQ</option>
+            <option value="desc">Descriptive</option>
+        </select>
+
+        <button onclick="uploadFile()">Upload</button>
+        <p id="shareableURL"></p>
+    </div>
+
+    <script src="../js/images.js"></script>
+    
+</body>
+</html>

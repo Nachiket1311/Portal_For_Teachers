@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Quiz</title>
+    <link rel="stylesheet" href="../css/MCQ-pattern.css">
+    <!-- Add Firebase SDK -->
+     <script src="../../../../security/Main.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+</head>
+<body>
+    <h1>MCQ Quiz</h1>
+    
+    <!-- Modal for User Input -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Select Your Preferences</h2>
+            <form id="preferencesForm">
+                <label for="std">Standard:</label>
+                <select id="std" required>
+                    <option value="">Select Standard</option>
+                    <!-- Standards will be populated here -->
+                </select>
+                <br><br>
+                <label for="subject">Subject:</label>
+                <select id="subject" required>
+                    <option value="">Select Subject</option>
+                    <!-- Subjects will be populated here -->
+                </select>
+                <br><br>
+                <label for="medium">Medium:</label>
+                <select id="medium"  required>
+                    <option value="">Select Medium</option>
+                    <option value="english">English</option>
+                    <option value="marathi">Marathi</option>
+                    <!-- Chapters will be populated here -->
+                </select>
+                <br><br>
+                <label for="chapter">Chapter:</label>
+                <select id="chapter" multiple required>
+                    <option value="">Select Chapter</option>
+                    <!-- Chapters will be populated here -->
+                </select>
+                <br><br>
+                <label for="numQuestions">Number of Questions:</label>
+                <input type="number" id="numQuestions" min="1" placeholder="Number of Question You want" required>
+                <br><br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <button id="print">Print Question</button>
+    <div id="quiz-container"></div>
+
+    <script src="../js/MCQ-Pattern.js"></script>
+    
+    <script src="../js/print.js"></script>
+</body>
+</html>

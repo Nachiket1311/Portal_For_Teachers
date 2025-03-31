@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard</title>
+  <!-- Bootstrap CSS for styling -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script src="../../security/Main.js"></script>
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="container-fluid">
+    <!-- Left Profile Sidebar -->
+    <div class="profile-sidebar">
+      <h2>Teacher Profile</h2>
+      <ul>
+          <!-- Admin details will be dynamically inserted here -->
+          <li>Name: Admin</li>
+          <li>Email: admin@example.com</li>
+          <li>Role: Administrator</li>
+      </ul>
+      <button id="Logout" class="btn btn-primary">Log Out</button>
+  </div>
+  
+
+    <!-- Right Dashboard Section -->
+    <div class="dashboard-section">
+      <h2>Manage MCQs</h2>
+      <!-- Buttons for Bulk and Single MCQ Upload -->
+      <div class=" mb-3">
+        <button class="btn btn-primary" id="uploadBulkBtn">Upload Bulk MCQs</button>
+        <button class="btn btn-primary" id="uploadBulkBtn-desc">Upload Bulk Descriptive Questions </button>
+        <button class="btn btn-primary" id="uploadimgBtn">Upload Image Questions </button>
+        <button class="btn btn-outline-warning" id="excel-format">Download sample excel format </button>
+      </div>
+      <div id="div-pref-form" style="display: none;">
+      <form id="excel-format-form" >
+        <label for="format">Select Excel Format:</label>
+        <select id="format" required>
+            <option value="mcq-format">MCQ</option>
+            <option value="desc-format">Descriptive</option>
+            
+        </select>
+        <br><br>
+        <button type="submit">Download</button>
+    </form>
+  </div>
+      <h3>Question Status:</h3>
+      <button class="btn btn-success" id="acceptedQuestionsBtn" onclick="uploadedbyme()">Uploaded by me</button>
+      <button class="btn btn-secondary" id="totalQuestionsBtn" onclick="Totalq()">Total Questions</button>
+
+      <!-- New Button to Link to the Question Selector Page -->
+      <div class="mt-3">
+        <button class="btn btn-info" onclick="mcqpapermaker()">Make MCQ Question Paper</button>
+        <button class="btn btn-info" onclick="descpapermaker()">Make Descriptive Question Paper</button>
+        <button class="btn btn-info" onclick="finalpapermaker()">Make Final Exam Question Paper</button>
+      </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+  <script src="../js/dashboard.js"></script>
+  
+</body>
+</html>
+
+

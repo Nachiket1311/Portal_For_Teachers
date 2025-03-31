@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage syllabus</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/manage-chapter.css">
+  <script src="../../security/Main.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Manage syllabus</h2>
+    
+    <!-- Pattern Form -->
+    <form id="syllabusForm" class="mt-4">
+      <div class="form-group">
+        <label for="stdnumber">STD Number</label>
+        <input type="number" id="stdnumber" class="form-control" placeholder="Enter Standard" required>
+      </div>
+      <div class="form-group">
+        <label for="Medium">Medium</label>
+        <input type="text" id="Medium" class="form-control" placeholder="Enter Medium" required>
+      </div>
+      <div class="form-group">
+        <label for="Subject">Subject</label>
+        <input type="text" id="Subject" class="form-control" placeholder="Enter Subject" required>
+      </div>
+      <!-- Questions Table -->
+      <h4>Enter Chapters List</h4>
+      <table class="table table-bordered mt-3">
+        <thead>
+          <tr>
+            <th>SR. Number</th>
+            <th>Name of Chapter</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="questionsTableBody">
+          <!-- Rows will be dynamically added here -->
+        </tbody>
+      </table>
+
+      <button type="button" class="btn btn-secondary " onclick="addQuestionRow()">Add Question Row</button>
+      <button type="button" class="btn btn-primary" onclick="saveSyllabus()">Save Pattern</button>
+    </form>
+
+    <hr>
+
+    <h3>Existing syllabus</h3>
+    <ul id="syllabusList" class="list-group mt-3">
+      <!-- Pattern list will be dynamically populated here -->
+    </ul>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+  <script src="../js/manage-chapter.js"></script>
+  
+</body>
+</html>

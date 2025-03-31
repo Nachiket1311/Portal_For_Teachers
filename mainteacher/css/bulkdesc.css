@@ -1,0 +1,127 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Button Styling */
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Question List Container */
+#question-list {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Question Body Row Color */
+#questions-body td {
+    color: #333;
+}
+
+/* Action Button Styling */
+.action-button {
+    padding: 8px 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.action-button:hover {
+    background-color: #218838;
+}
+
+/* Media Queries for Responsiveness */
+@media screen and (max-width: 768px) {
+
+    /* Stack buttons on smaller screens */
+    button {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    /* Adjust table font and padding on smaller screens */
+    table {
+        font-size: 12px;
+        display: block;
+        overflow-x: auto; /* Make the table scrollable horizontally */
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    /* Center table text on smaller screens */
+    th, td {
+        text-align: center;
+    }
+}
+
+/* Further adjustments for mobile screens */
+@media screen and (max-width: 480px) {
+    
+    /* Reduce padding for small mobile screens */
+    body {
+        padding: 10px;
+    }
+
+ 
+    button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    th, td {
+        font-size: 10px;
+        padding: 8px;
+    }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Question Paper</title>
+    <link rel="stylesheet" href="../css/final-pattern.css">
+    <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+    <script src="../../../../security/Main.js"></script>
+</head>
+<body>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Select Your Preferences</h2>
+            <form id="preferencesForm">
+                <label for="std">Standard:</label>
+                <select id="std" required>
+                    <option value="">Select Standard</option>
+                    <!-- Standards will be populated here -->
+                </select>
+                <br><br>
+                <label for="subject">Subject:</label>
+                <select id="subject" required>
+                    <option value="">Select Subject</option>
+                    <!-- Subjects will be populated here -->
+                </select>
+                <br><br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="quiz-container">
+        <div class="mcq">
+            <b><label for="Q1-A">Q1-A</label></b>
+            <div id="Q1-A"></div>
+        </div>
+        <div class="1M">
+            <b><label for="Q1-B">Q1-B</label></b> 
+            <div id="Q1-B"></div>
+        </div>
+        <div class="2M">
+            <b><label for="Q2-A">Q2-A:(Any two)</label></b> 
+            <div id="Q2-A"></div>
+        </div>
+        <div class="2M">
+            <b><label for="Q2-B">Q2-B:(Any three)</label></b> 
+            <div id="Q2-B"></div>
+        </div>
+        <div class="3M">
+            <b><label for="Q3">Q3:(Any Five)</label></b> 
+            <div id="Q3"></div>
+        </div>
+        <div class="5M">
+            <b><label for="Q4">Q4:(Any One)</label></b> 
+            <div id="Q4"></div>
+        </div>
+    </div>
+    <script src="../js/final-pattern.js"></script>
+    
+</body>
+</html>

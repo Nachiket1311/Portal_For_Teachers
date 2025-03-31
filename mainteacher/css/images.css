@@ -1,0 +1,72 @@
+/* Background Animation */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, #3b42fe, #9b33f6, #2f9ef8, #3b42fe);
+    background-size: 400% 400%;
+    animation: gradientBG 8s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Container */
+.container {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 650px;
+}
+
+/* Inputs & Dropdowns */
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* File Upload Button */
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/* Upload Button */
+button {
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Image Preview */
+.preview img {
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    display: none;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Questions</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <script src="../../security/Main.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Total Questions</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Option A</th>
+                    <th>Option B</th>
+                    <th>Option C</th>
+                    <th>Option D</th>
+                    <th>Correct Answer</th>
+                    <th>Marks</th>
+                    <th>Chapter</th>
+                    <th>STD</th>
+                    <th>Medium</th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody id="rejected-body">
+                <!-- Questions will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <script  src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
+    <script  src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+    <script src="../js/Totalq.js"></script>
+    
+</body>
+</html>
