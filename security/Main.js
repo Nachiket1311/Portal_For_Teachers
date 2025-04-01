@@ -13,3 +13,27 @@ const firebaseConfig = {
     appId: "1:434941271852:web:1e8d84c1b604779c535689",
     measurementId: "G-XKT2SXN6VZ"
   };
+
+
+  function validateAccessToken() {
+    // Check if the user is on the login page
+    const currentPage = window.location.pathname;
+    if (currentPage.includes('login')) {
+      return; // Skip validation if on the login page
+    }
+  
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenInURL = urlParams.get("token"); // Now using "token" in URL
+    const storedToken = localStorage.getItem("authToken"); // Token saved after login
+  
+  
+    // If token is missing or doesn't match stored token, deny access
+    if (!tokenInURL || tokenInURL !== storedToken) {
+        alert("Unauthorized access! Invalid or missing token.");
+    }
+  }
+  
+
+
+// Run access check on page load
+document.addEventListener("DOMContentLoaded", validateAccessToken);

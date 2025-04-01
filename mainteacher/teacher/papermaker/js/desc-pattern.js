@@ -1,9 +1,8 @@
-
-
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const database = firebase.database(app);
 
+let isFirstRun = true;
 // Show modal on page load
 window.onload = function() {
     document.getElementById('myModal').style.display = 'block';
@@ -87,13 +86,14 @@ document.getElementById('preferencesForm').onsubmit = function(event) {
     event.preventDefault();
     const std = document.getElementById('std').value;
     const subject = document.getElementById('subject').value;
-    const chapter = document.getElementById('chapter').value;
+    const chapterSelect = document.getElementById('chapter');
+    const selectedChapters = Array.from(chapterSelect.selectedOptions).map(option => option.value);
     const numQuestions = parseInt(document.getElementById('numQuestions').value); // Get number of questions
 
-    console.log("Selected values:", { std, subject, chapter, numQuestions }); // Log selected values
+    
 
     document.getElementById('myModal').style.display = 'none';
-    fetchMCQs(std, subject, chapter, numQuestions); // Pass number of questions to fetchMCQs
+    fetchMCQs(std, subject, selectedChapters, numQuestions); // Pass number of questions to fetchMCQs
 };
 
 async function fetchMCQs(std, subject, chapter, numQuestions) {
@@ -101,34 +101,34 @@ async function fetchMCQs(std, subject, chapter, numQuestions) {
     questionsRef.once('value', (snapshot) => {
         const questions = snapshot.val();
         if (questions) {
- const mcqsArray = Object.values(questions);
-            console.log("Available MCQs:", mcqsArray); // Log available MCQs
-            console.log("Filtering with:", { std, subject, chapter }); // Log the filtering criteria
-
+            const mcqsArray = Object.values(questions);
             const filteredMCQs = mcqsArray.filter(question => {
-                // Log the current question being checked
-                console.log("Checking question:", question);
-
                 // Ensure to trim and convert to lowercase for comparison
                 const questionStd = question.std?.toString().trim().toLowerCase();
                 const questionSub = question.sub?.toString().trim().toLowerCase();
                 const questionChapter = question.chapter?.toString().trim().toLowerCase();
 
+                // Iterate over selected chapters to check if any match
                 return (
                     questionStd === std.trim().toLowerCase() &&
                     questionSub === subject.trim().toLowerCase() &&
-                    questionChapter === chapter.trim().toLowerCase()
+                    chapter.some(chap => chap.trim().toLowerCase() === questionChapter)
                 );
             });
+            console.log(filteredMCQs.length);
 
-            console.log("Filtered MCQs:", filteredMCQs); // Log filtered MCQs
-
-            const shuffledMCQs = shuffleArray(filteredMCQs);
-            const limitedMCQs = shuffledMCQs.slice(0, numQuestions); // Limit to the specified number of questions
-            displayQuestions(limitedMCQs);
+            if (filteredMCQs.length > 0) {
+                const shuffledMCQs = shuffleArray(filteredMCQs);
+                displayQuestions(shuffledMCQs,numQuestions);
+            } else {
+                console.log("No matching questions found for the criteria.");
+                displayQuestions([]); // Display no questions message
+            }
         } else {
-            console.log("No questions available.");
+            console.error("No questions available in the database.");
         }
+    }).catch(error => {
+        console.error("Error fetching MCQs:", error);
     });
 }
 
@@ -140,23 +140,163 @@ function shuffleArray(array) {
     }
     return array;
 }
-
-// Function to display questions
-function displayQuestions(questions) {
-    const quizContainer = document.getElementById('quiz-container');  
+function displayQuestions(questions,numQuestions) {
+    const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = ''; // Clear previous content
 
     if (questions.length === 0) {
         quizContainer.innerHTML = '<h3>No questions found for the selected criteria.</h3>';
         return;
     }
-    let count =1;
-    questions.forEach(question => {
-        const questionElement = document.createElement('div');
+
+    const limitedMCQs = questions.slice(0, numQuestions); // Limit to the specified number of questions
+    const availablequestion = questions.slice(numQuestions);
+    console.log("Number of questions to be there:", limitedMCQs);
+    console.log(availablequestion);
+    let answersArray = [];  // Initialize an empty array
+
+    // Render only the limited questions
+    limitedMCQs.forEach((question, index) => {
+        answersArray.push(question.Canswer); // Store correct answers in the array
+        createQuestionElement(quizContainer, availablequestion, question, index); // Create and render the question
+    });
+    
+}
+function createQuestionElement(quizContainer, questions, question, index) {
+    // Wrapper for the question
+    const questionWrapper = document.createElement('div');
+    const questionElement = document.createElement('div');
+    
+    questionWrapper.classList.add('question-wrapper');
+    questionWrapper.setAttribute('data-index', index);
+
+    // Display image if available
+    if (question.text === 'No') {
+        const imageElement = document.createElement('img');
+        imageElement.src = question.url;
+        imageElement.alt = "Question Image";
+        imageElement.classList.add('question-image');
+        questionWrapper.appendChild(imageElement);
+    } else {
+        // Display the question text
         questionElement.classList.add('question');
-        questionElement.innerHTML = `<h3>${count}) ${question.question}</h3>`;
-        count++;
-        quizContainer.appendChild(questionElement);
+        questionElement.innerHTML = `<h3>${index + 1}) ${question.question}</h3>`;
+
+      
+    }
+
+    // Custom Dropdown for available replacement questions
+    const dropdownWrapper = document.createElement('div');
+    dropdownWrapper.classList.add('custom-dropdown');
+
+    const dropdownButton = document.createElement('button');
+    dropdownButton.textContent = 'Select a question to replace';
+    dropdownButton.classList.add('dropdown-btn');
+
+    const dropdownList = document.createElement('ul');
+    dropdownList.classList.add('dropdown-list');
+    
+    questions.forEach((otherQuestion, otherIndex) => {
+        if (otherIndex !== index) {
+            const listItem = document.createElement('li');
+            listItem.classList.add('dropdown-item');
+          
+           
+
+// Create a span to hold the question text
+const textSpan = document.createElement('span');
+textSpan.textContent = `Q${otherIndex + 1}: `; // Set the text content
+
+// Create and configure image element
+if (otherQuestion.url) {
+    const img = document.createElement('img');
+    img.src = otherQuestion.url;
+    img.alt = 'Question Image';
+    img.style.width = '300px'; // Adjust size as needed
+    img.style.height = '200px';
+    img.style.marginLeft = '10px'; // Space between text and image
+
+    // Append text and image correctly
+    listItem.appendChild(textSpan);
+    listItem.appendChild(img);
+} else {
+    // If no image, just add text
+    listItem.appendChild(textSpan);
+    listItem.appendChild(document.createTextNode(otherQuestion.question));
+}
+
+
+            
+            listItem.onclick = () => {
+                replaceQuestion(questionWrapper, questions[otherIndex], index);
+            };
+
+            dropdownList.appendChild(listItem);
+        }
     });
 
+    dropdownWrapper.appendChild(dropdownButton);
+    dropdownWrapper.appendChild(dropdownList);
+    dropdownButton.onclick = () => dropdownList.classList.toggle('show');
+
+    // Append elements to the wrapper
+    questionWrapper.appendChild(questionElement);
+    questionWrapper.appendChild(dropdownWrapper);
+
+    // Append the wrapper to the quiz container
+    quizContainer.appendChild(questionWrapper);
 }
+
+function replaceQuestion(questionWrapper, newQuestion, index) {
+    if (!questionWrapper) {
+        console.error("Question wrapper not found!");
+        return;
+    }
+
+    // Retrieve answers and selected questions from localStorage
+    let answersArray = JSON.parse(localStorage.getItem("answers")) || [];
+    let selectedQuestions = JSON.parse(localStorage.getItem("selectedQuestions")) || [];
+
+    // Check if the question is already selected
+    if (selectedQuestions.includes(newQuestion.question)||selectedQuestions.includes(newQuestion.url)) {
+        alert("You have already selected this question. Please choose a different question.");
+        return;
+    }
+
+    if (newQuestion.url) {
+        selectedQuestions.push(newQuestion.url);
+    }else{
+        selectedQuestions.push(newQuestion.question);
+    }
+    
+    localStorage.setItem("selectedQuestions", JSON.stringify(selectedQuestions));
+
+    // Log old and new answers array
+
+
+    // Select the elements inside questionWrapper
+    const questionElement = questionWrapper.querySelector('.question h3');
+
+    // Check if the question has an image
+if (newQuestion.url) {
+    questionElement.innerHTML =`${index + 1})`;
+      // Clear previous options
+      optionsList.innerHTML = '';
+    let imgElement = questionWrapper.querySelector('.question img');
+
+    if (!imgElement) {
+        imgElement = document.createElement('img');
+        imgElement.classList.add('question-image'); // Add a class for styling
+        questionWrapper.querySelector('.question').appendChild(imgElement);
+    }
+
+    imgElement.src = newQuestion.url;
+    imgElement.alt = "Question Image";
+} else {
+    // Update question text
+    questionElement.innerHTML = `${index + 1}) ${newQuestion.question}`;
+
+   }
+
+}
+

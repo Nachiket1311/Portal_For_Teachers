@@ -96,6 +96,12 @@ document.getElementById('uploadBulkBtn-desc').addEventListener('click', () => {
     window.open(url, '_blank');
 });
 
+document.getElementById('uploadimg').addEventListener('click', () => {
+    const authToken = localStorage.getItem('authToken');
+    const url =`./image.html?token=${authToken}`;
+    window.open(url, '_blank');
+});
+
 
 document.getElementById('Logout').addEventListener('click', () => {
     localStorage.clear();

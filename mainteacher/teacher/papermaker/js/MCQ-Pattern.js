@@ -165,24 +165,21 @@ function displayQuestions(questions,numQuestions) {
     revelans();
     
 }
-
 function createQuestionElement(quizContainer, questions, question, index) {
     // Wrapper for the question
     const questionWrapper = document.createElement('div');
-    const questionDropdown = document.createElement('select');
     const questionElement = document.createElement('div');
     
     questionWrapper.classList.add('question-wrapper');
     questionWrapper.setAttribute('data-index', index);
 
     // Display image if available
-    if (question.text == 'No') {
+    if (question.text === 'No') {
         const imageElement = document.createElement('img');
-        imageElement.src = question.image;
+        imageElement.src = question.url;
         imageElement.alt = "Question Image";
-        imageElement.classList.add('question-image'); // Add CSS class for styling
+        imageElement.classList.add('question-image');
         questionWrapper.appendChild(imageElement);
-        
     } else {
         // Display the question text
         questionElement.classList.add('question');
@@ -201,45 +198,63 @@ function createQuestionElement(quizContainer, questions, question, index) {
         questionElement.appendChild(optionsList);
     }
 
-    // Dropdown for available replacement questions
-    questionDropdown.className = 'question-dropdown';
+    // Custom Dropdown for available replacement questions
+    const dropdownWrapper = document.createElement('div');
+    dropdownWrapper.classList.add('custom-dropdown');
 
-    const defaultOption = document.createElement('option');
-    defaultOption.text = 'Select a question to replace';
-    defaultOption.value = '';
-    questionDropdown.appendChild(defaultOption);
+    const dropdownButton = document.createElement('button');
+    dropdownButton.textContent = 'Select a question to replace';
+    dropdownButton.classList.add('dropdown-btn');
 
+    const dropdownList = document.createElement('ul');
+    dropdownList.classList.add('dropdown-list');
     
+    questions.forEach((otherQuestion, otherIndex) => {
+        if (otherIndex !== index) {
+            const listItem = document.createElement('li');
+            listItem.classList.add('dropdown-item');
+          
+           
 
-  // Populate dropdown with available questions
-questions.forEach((otherQuestion, otherIndex) => {
-    if (otherIndex !== index) { // Ensure it excludes the current question
-        const dropdownOption = document.createElement('option'); // Create a new option each time
-        
-        // Check if the other question has an image
-        if (otherQuestion.url) {
-            dropdownOption.text = `Q${otherIndex + 1}:<img src="${otherQuestion.url}" alt=""> `;
-        } else {
-            dropdownOption.text = `Q${otherIndex + 1}: ${otherQuestion.question}`;
-        }
-        
-        dropdownOption.value = otherIndex;
-        questionDropdown.appendChild(dropdownOption);
-    }
-});
+// Create a span to hold the question text
+const textSpan = document.createElement('span');
+textSpan.textContent = `Q${otherIndex + 1}: `; // Set the text content
 
-    // Event listener for replacing a specific question
-    questionDropdown.addEventListener('change', (event) => {
-        const selectedIndex = parseInt(event.target.value, 10);
-        if (!isNaN(selectedIndex)) {
-            const selectedQuestion = questions[selectedIndex];
-            replaceQuestion(questionWrapper, selectedQuestion, index);
+// Create and configure image element
+if (otherQuestion.url) {
+    const img = document.createElement('img');
+    img.src = otherQuestion.url;
+    img.alt = 'Question Image';
+    img.style.width = '300px'; // Adjust size as needed
+    img.style.height = '200px';
+    img.style.marginLeft = '10px'; // Space between text and image
+
+    // Append text and image correctly
+    listItem.appendChild(textSpan);
+    listItem.appendChild(img);
+} else {
+    // If no image, just add text
+    listItem.appendChild(textSpan);
+    listItem.appendChild(document.createTextNode(otherQuestion.question));
+}
+
+
+            
+            listItem.onclick = () => {
+                replaceQuestion(questionWrapper, questions[otherIndex], index);
+            };
+
+            dropdownList.appendChild(listItem);
         }
     });
 
+    dropdownWrapper.appendChild(dropdownButton);
+    dropdownWrapper.appendChild(dropdownList);
+    dropdownButton.onclick = () => dropdownList.classList.toggle('show');
+
     // Append elements to the wrapper
     questionWrapper.appendChild(questionElement);
-    questionWrapper.appendChild(questionDropdown);
+    questionWrapper.appendChild(dropdownWrapper);
 
     // Append the wrapper to the quiz container
     quizContainer.appendChild(questionWrapper);
@@ -256,13 +271,17 @@ function replaceQuestion(questionWrapper, newQuestion, index) {
     let selectedQuestions = JSON.parse(localStorage.getItem("selectedQuestions")) || [];
 
     // Check if the question is already selected
-    if (selectedQuestions.includes(newQuestion.question)) {
+    if (selectedQuestions.includes(newQuestion.question)||selectedQuestions.includes(newQuestion.url)) {
         alert("You have already selected this question. Please choose a different question.");
         return;
     }
 
-    // Add the new question to the selected questions array
-    selectedQuestions.push(newQuestion.question);
+    if (newQuestion.url) {
+        selectedQuestions.push(newQuestion.url);
+    }else{
+        selectedQuestions.push(newQuestion.question);
+    }
+    
     localStorage.setItem("selectedQuestions", JSON.stringify(selectedQuestions));
 
     // Log old and new answers array
