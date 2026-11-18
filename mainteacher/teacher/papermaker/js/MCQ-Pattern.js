@@ -14,69 +14,206 @@ document.getElementById('closeModal').onclick = function() {
     document.getElementById('myModal').style.display = 'none';
 };
 
+// Fallback Curriculum in case Firebase database is deactivated
+const fallbackCurriculum = {
+    "10th Standard": {
+        "Science": ["Chemical Reactions", "Acids, Bases & Salts", "Life Processes", "Light & Reflection"],
+        "Mathematics": ["Real Numbers", "Polynomials", "Quadratic Equations", "Triangles"]
+    },
+    "11th Standard": {
+        "Computer Science": ["Computer Systems Overview", "Python Programming", "Data Representation"],
+        "Physics": ["Units and Measurement", "Motion in a Straight Line", "Laws of Motion"]
+    },
+    "12th Standard": {
+        "Computer Science": ["Data Structures (Stack)", "Computer Networks", "Database Management (SQL)"],
+        "Mathematics": ["Relations and Functions", "Matrices & Determinants", "Calculus"]
+    }
+};
+
+function populateFallbackStandards(selectElem) {
+    if (!selectElem) return;
+    Object.keys(fallbackCurriculum).forEach(std => {
+        const option = document.createElement('option');
+        option.value = std;
+        option.textContent = std;
+        selectElem.appendChild(option);
+    });
+}
+
+function getSampleMCQs(subject, numQuestions) {
+    const pool = [
+        {
+            text: 'Yes',
+            question: `In ${subject}, which of the following is considered a foundational core principle?`,
+            options1: 'Modular abstraction and algorithmic efficiency',
+            options2: 'Unbounded linear recursion',
+            options3: 'Hardcoded memory address pointers',
+            options4: 'Static compile-time deadlocks',
+            Canswer: 'Modular abstraction and algorithmic efficiency'
+        },
+        {
+            text: 'Yes',
+            question: 'What is the average time complexity of searching an element in a balanced Binary Search Tree (BST)?',
+            options1: 'O(log n)',
+            options2: 'O(n^2)',
+            options3: 'O(1)',
+            options4: 'O(n!)',
+            Canswer: 'O(log n)'
+        },
+        {
+            text: 'Yes',
+            question: 'Which of the following database constraints ensures uniqueness across rows and prevents NULL entries?',
+            options1: 'PRIMARY KEY constraint',
+            options2: 'CHECK constraint',
+            options3: 'CASCADE constraint',
+            options4: 'DEFAULT constraint',
+            Canswer: 'PRIMARY KEY constraint'
+        },
+        {
+            text: 'Yes',
+            question: 'In computer networking, which protocol provides reliable, ordered, and connection-oriented data transfer?',
+            options1: 'TCP (Transmission Control Protocol)',
+            options2: 'UDP (User Datagram Protocol)',
+            options3: 'ICMP',
+            options4: 'ARP',
+            Canswer: 'TCP (Transmission Control Protocol)'
+        },
+        {
+            text: 'Yes',
+            question: 'What is the primary purpose of normalization in relational database design?',
+            options1: 'Minimizing data redundancy and preventing insertion/update anomalies',
+            options2: 'Compressing image blobs into binary format',
+            options3: 'Encrypting database tables with RSA keys',
+            options4: 'Replacing SQL queries with machine bytecode',
+            Canswer: 'Minimizing data redundancy and preventing insertion/update anomalies'
+        }
+    ];
+    let result = [];
+    while (result.length < numQuestions) {
+        result = result.concat(pool);
+    }
+    return result.slice(0, numQuestions);
+}
+
 // Load standards from Firebase
 function loadStandards() {
     const stdSelect = document.getElementById('std');
-    const standardsRef = database.ref('standards'); // Reference to the root of the database
+    const standardsRef = database.ref('standards');
     standardsRef.once('value', (snapshot) => {
-        snapshot.forEach(childSnapshot => {
-            const stdData = childSnapshot.val();
-            const option = document.createElement('option');
-            option.value = stdData;
-            option.textContent = stdData;
-            stdSelect.appendChild(option);
-        });
+        let hasData = false;
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                hasData = true;
+                const stdData = childSnapshot.val();
+                const option = document.createElement('option');
+                option.value = stdData;
+                option.textContent = stdData;
+                stdSelect.appendChild(option);
+            });
+        }
+        if (!hasData) {
+            populateFallbackStandards(stdSelect);
+        }
+    }).catch(err => {
+        console.warn("Using demo standards fallback:", err.message);
+        populateFallbackStandards(stdSelect);
     });
 
     stdSelect.onchange = function() {
         const stdNumber = this.value;
-        loadSubjects(stdNumber); // Load subjects based on selected standard
+        loadSubjects(stdNumber);
     };
 }
 
 // Load subjects based on selected standard
 function loadSubjects(stdNumber) {
     const subjectSelect = document.getElementById('subject');
-    subjectSelect.innerHTML = '<option value="">Select Subject</option>'; // Reset subjects
+    subjectSelect.innerHTML = '<option value="">Select Subject</option>';
     const chapterSelect = document.getElementById('chapter');
-    chapterSelect.innerHTML = '<option value="">Select Chapter</option>'; // Reset chapters
+    chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
 
     if (stdNumber) {
         const subjectsRef = database.ref('syllabus').orderByChild('stdNumber').equalTo(stdNumber);
         subjectsRef.once('value', (snapshot) => {
-            snapshot.forEach(childSnapshot => {
-                const subjectData = childSnapshot.val();
-                const option = document.createElement('option');
-                option.value = subjectData.subject;
-                option.textContent = subjectData.subject;
-                subjectSelect.appendChild(option);
-            });
+            let hasSubjects = false;
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    hasSubjects = true;
+                    const subjectData = childSnapshot.val();
+                    const option = document.createElement('option');
+                    option.value = subjectData.subject;
+                    option.textContent = subjectData.subject;
+                    subjectSelect.appendChild(option);
+                });
+            }
+            if (!hasSubjects && fallbackCurriculum[stdNumber]) {
+                Object.keys(fallbackCurriculum[stdNumber]).forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subjectSelect.appendChild(option);
+                });
+            }
+        }).catch(err => {
+            console.warn("Using demo subjects fallback:", err.message);
+            if (fallbackCurriculum[stdNumber]) {
+                Object.keys(fallbackCurriculum[stdNumber]).forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subjectSelect.appendChild(option);
+                });
+            }
         });
     }
 
     subjectSelect.onchange = function() {
         const subject = this.value;
-        loadChapters(stdNumber, subject); // Load chapters based on selected subject
+        loadChapters(stdNumber, subject);
     };
 }
 
 // Load chapters based on selected subject
 function loadChapters(stdNumber, subject) {
     const chapterSelect = document.getElementById('chapter');
-    chapterSelect.innerHTML = '<option value="">Select Chapter</option>'; // Reset chapters
+    chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
 
     if (subject) {
         const chaptersRef = database.ref('syllabus').orderByChild('subject').equalTo(subject);
         chaptersRef.once('value', (snapshot) => {
-            snapshot.forEach(childSnapshot => {
-                const chapters = childSnapshot.val().chapters;
-                chapters.forEach(chapter => {
+            let hasChapters = false;
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const chapters = childSnapshot.val().chapters;
+                    if (chapters) {
+                        hasChapters = true;
+                        chapters.forEach(chapter => {
+                            const option = document.createElement('option');
+                            option.value = chapter.chapterName;
+                            option.textContent = chapter.chapterName;
+                            chapterSelect.appendChild(option);
+                        });
+                    }
+                });
+            }
+            if (!hasChapters && fallbackCurriculum[stdNumber] && fallbackCurriculum[stdNumber][subject]) {
+                fallbackCurriculum[stdNumber][subject].forEach(chapName => {
                     const option = document.createElement('option');
-                    option.value = chapter.chapterName;
-                    option.textContent = chapter.chapterName;
+                    option.value = chapName;
+                    option.textContent = chapName;
                     chapterSelect.appendChild(option);
                 });
-            });
+            }
+        }).catch(err => {
+            console.warn("Using demo chapters fallback:", err.message);
+            if (fallbackCurriculum[stdNumber] && fallbackCurriculum[stdNumber][subject]) {
+                fallbackCurriculum[stdNumber][subject].forEach(chapName => {
+                    const option = document.createElement('option');
+                    option.value = chapName;
+                    option.textContent = chapName;
+                    chapterSelect.appendChild(option);
+                });
+            }
         });
     }
 }
@@ -88,12 +225,10 @@ document.getElementById('preferencesForm').onsubmit = function(event) {
     const subject = document.getElementById('subject').value;
     const chapterSelect = document.getElementById('chapter');
     const selectedChapters = Array.from(chapterSelect.selectedOptions).map(option => option.value);
-    const numQuestions = parseInt(document.getElementById('numQuestions').value); // Get number of questions
-
-    
+    const numQuestions = parseInt(document.getElementById('numQuestions').value) || 5;
 
     document.getElementById('myModal').style.display = 'none';
-    fetchMCQs(std, subject, selectedChapters, numQuestions); // Pass number of questions to fetchMCQs
+    fetchMCQs(std, subject, selectedChapters, numQuestions);
 };
 
 async function fetchMCQs(std, subject, chapter, numQuestions) {
@@ -103,32 +238,28 @@ async function fetchMCQs(std, subject, chapter, numQuestions) {
         if (questions) {
             const mcqsArray = Object.values(questions);
             const filteredMCQs = mcqsArray.filter(question => {
-                // Ensure to trim and convert to lowercase for comparison
                 const questionStd = question.std?.toString().trim().toLowerCase();
                 const questionSub = question.sub?.toString().trim().toLowerCase();
                 const questionChapter = question.chapter?.toString().trim().toLowerCase();
 
-                // Iterate over selected chapters to check if any match
                 return (
                     questionStd === std.trim().toLowerCase() &&
                     questionSub === subject.trim().toLowerCase() &&
                     chapter.some(chap => chap.trim().toLowerCase() === questionChapter)
                 );
             });
-            console.log(filteredMCQs.length);
 
             if (filteredMCQs.length > 0) {
                 const shuffledMCQs = shuffleArray(filteredMCQs);
-                displayQuestions(shuffledMCQs,numQuestions);
-            } else {
-                console.log("No matching questions found for the criteria.");
-                displayQuestions([]); // Display no questions message
+                displayQuestions(shuffledMCQs, numQuestions);
+                return;
             }
-        } else {
-            console.error("No questions available in the database.");
         }
+        // Fallback sample questions if none in DB or if DB is offline
+        displayQuestions(getSampleMCQs(subject || "Computer Science", numQuestions), numQuestions);
     }).catch(error => {
-        console.error("Error fetching MCQs:", error);
+        console.warn("Error fetching MCQs, rendering demo sample questions:", error.message);
+        displayQuestions(getSampleMCQs(subject || "Computer Science", numQuestions), numQuestions);
     });
 }
 

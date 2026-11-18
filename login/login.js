@@ -1,9 +1,12 @@
-
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+// Initialize Firebase safely
+let app, auth, db;
+try {
+    app = firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.database();
+} catch (e) {
+    console.warn("Firebase initialization warning:", e);
+}
 
 const signUpButton = document.getElementById('signUp');
 const signInButton = document.getElementById('signIn');
@@ -11,85 +14,25 @@ const container = document.getElementById('container');
 const signinform = document.getElementById("signin");
 const createaccount = document.getElementById("createaccount");
 
-// signUpButton.addEventListener('click', () => {
-//     container.classList.add("right-panel-active");
-// });
-
-// signInButton.addEventListener('click', () => {
-//     container.classList.remove("right-panel-active");
-// });
-
 // Check if username is unique
 function checkUsernameUnique(username) {
+    if (!db) return Promise.resolve(true);
     return db.ref('users').orderByChild('username').equalTo(username).once('value')
         .then(snapshot => {
             return !snapshot.exists();  // Returns true if username is unique, false if already taken
         });
 }
 
-// // Handle Sign-Up
-// createaccount.addEventListener("submit", (event) => {
-//     event.preventDefault(); // Prevent the default form submission
-
-//     const username = document.getElementById('signup-username').value;
-//     const name = document.getElementById('signup-name').value;
-//     const email = document.getElementById('signup-email').value;
-//     const password = document.getElementById('signup-password').value;
-//     const role = document.querySelector('input[name="role"]:checked').value;
-
-//     // Validate inputs
-//     if (!email || !password || !role || !username || !name) {
-//         alert("Please fill in all fields.");
-//         return;
-//     }
-
-//     if (password.length < 6) {
-//         alert("Password must be at least 6 characters long.");
-//         return;
-//     }
-
-//     // Check if the username is unique
-//     checkUsernameUnique(username).then(isUnique => {
-//         if (!isUnique) {
-//             alert("Username already taken. Please choose a different username.");
-//             return;
-//         }
-
-//         // If username is unique, create a new user
-//         auth.createUserWithEmailAndPassword(email, password)
-//             .then((userCredential) => {
-//                 const user = userCredential.user;
-//                 const userId = user.uid;
-
-//                 // Store the user data in Realtime Database
-//                 return db.ref('users/' + userId).set({
-//                     username: username,
-//                     name: name,
-//                     email: email,
-//                     role: role
-//                 });
-//             })
-//             .then(() => {
-//                 alert('Account created successfully');
-//                 document.getElementById('createaccount').reset();
-//             })
-//             .catch((error) => {
-//                 console.error("Error: ", error.message);
-//                 alert("Error: " + error.message);
-//             });
-//     }).catch((error) => {
-//         console.error("Error checking username uniqueness: ", error);
-//         alert("Error checking username uniqueness: " + error.message);
-//     });
-// });
-
 // Handle Sign-In
 signinform.addEventListener("submit", (event) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault(); // Prevent default form submission
 
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
+    const usernameInput = document.getElementById('login-username');
+    const passwordInput = document.getElementById('login-password');
     const submitBtn = document.getElementById('submitBtn');
+
+    const username = usernameInput ? usernameInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value.trim() : '';
 
     if (!username || !password) {
         alert("Please provide both username and password.");
@@ -101,8 +44,62 @@ signinform.addEventListener("submit", (event) => {
         submitBtn.disabled = true;
     }
 
-    // Check if the username exists and get the associated email
+    const resetSubmitBtn = () => {
+        if (submitBtn) {
+            submitBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right ml-2"></i>';
+            submitBtn.disabled = false;
+        }
+    };
+
+    const normalizedUser = username.toLowerCase();
+
+    // 1. FAST-PATH DEMO CREDENTIALS:
+    // If user enters documented demo credentials (Admin / 123456 or Teacher / 123456),
+    // authenticate immediately without hanging on the deactivated Firebase database.
+    if ((normalizedUser === 'admin' || normalizedUser === 'teacher') && password === '123456') {
+        const isTeacher = (normalizedUser === 'teacher');
+        const role = isTeacher ? 'teacher' : 'admin';
+        const displayName = isTeacher ? 'Demo Teacher' : 'Demo Admin';
+        const displayEmail = isTeacher ? 'teacher@examcraft.edu' : 'admin@examcraft.edu';
+        const demoToken = `demo-${role}-token-${Date.now()}`;
+
+        localStorage.setItem("username", displayName);
+        localStorage.setItem("email", displayEmail);
+        localStorage.setItem("role", role);
+        localStorage.setItem("authToken", demoToken);
+
+        const redirectUrl = isTeacher
+            ? `../mainteacher/teacher/dashboard.html?token=${encodeURIComponent(demoToken)}`
+            : `../mainadmin/admin/dashboard.html?token=${encodeURIComponent(demoToken)}`;
+
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 300);
+        return;
+    }
+
+    // 2. LIVE FIREBASE AUTHENTICATION (with timeout protection against deactivated database):
+    if (!db || !auth) {
+        alert("Firebase is offline. Please use the Demo Credentials:\n• Admin: Admin / 123456\n• Teacher: Teacher / 123456");
+        resetSubmitBtn();
+        return;
+    }
+
+    let authCompleted = false;
+    const dbTimeout = setTimeout(() => {
+        if (!authCompleted) {
+            authCompleted = true;
+            resetSubmitBtn();
+            alert("Database connection timed out.\nThe remote Firebase database (dc-project-c88d0) has been deactivated by Google.\n\nPlease use the Demo Credentials to explore the portal:\n• Admin: Admin / 123456\n• Teacher: Teacher / 123456");
+        }
+    }, 4500);
+
+    // Check if username exists and get the associated email
     db.ref('users').orderByChild('username').equalTo(username).once('value', snapshot => {
+        if (authCompleted) return;
+        clearTimeout(dbTimeout);
+        authCompleted = true;
+
         if (snapshot.exists()) {
             snapshot.forEach(userSnapshot => {
                 const email = userSnapshot.val().email;
@@ -133,61 +130,72 @@ signinform.addEventListener("submit", (event) => {
                                         redirectUrl = `../mainteacher/teacher/dashboard.html?token=${idToken}`;
                                     } else {
                                         console.error('Unknown role:', role);
-                                        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
+                                        resetSubmitBtn();
                                         return;
                                     }
 
-                                    // Redirect to the appropriate dashboard with the token in the URL
+                                    // Redirect to the appropriate dashboard with token in the URL
                                     window.location.href = redirectUrl;
                                 });
                             })
                             .catch((error) => {
                                 console.error('Error fetching user data:', error);
-                                if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
+                                resetSubmitBtn();
                             });
                     })
                     .catch((error) => {
                         console.error("Error signing in: ", error.message);
                         alert("Error: " + error.message);
-                        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
+                        resetSubmitBtn();
                     });
             });
         } else {
-            alert('Username not found');
-            if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
+            alert('Username not found. To explore the demo, please use:\n• Admin / 123456\n• Teacher / 123456');
+            resetSubmitBtn();
         }
     }).catch(err => {
+        if (authCompleted) return;
+        clearTimeout(dbTimeout);
+        authCompleted = true;
         console.error("Database lookup error:", err);
-        alert("Database connection error: " + err.message);
-        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
+        alert("Firebase Database Error: " + err.message + "\n\nNote: The original database was deactivated by Google.\nPlease use Demo credentials (Admin / 123456 or Teacher / 123456) to test.");
+        resetSubmitBtn();
     });
 });
 
 // Handle Forgot Password
-document.getElementById('forgot-password').addEventListener('click', (event) => {
-    event.preventDefault();
-    const email = prompt("Please enter your email address:");
-    
-    if (email) {
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert("Password reset email sent. Please check your inbox.");
-            })
-            .catch((error) => {
-                console.error("Error sending password reset email: ", error.message);
-                alert("Error: " + error.message);
-            });
-    } else {
-        alert("Email address cannot be empty.");
-    }
-});
+const forgotPasswordBtn = document.getElementById('forgot-password');
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const email = prompt("Please enter your email address:");
+        
+        if (email && auth) {
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    alert("Password reset email sent. Please check your inbox.");
+                })
+                .catch((error) => {
+                    console.error("Error sending password reset email: ", error.message);
+                    alert("Error: " + error.message);
+                });
+        } else if (!email) {
+            alert("Email address cannot be empty.");
+        } else {
+            alert("Firebase Auth is currently offline.");
+        }
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const bg = document.querySelector(".background-animation");
-    for (let i = 0; i < 50; i++) {
-        let bubble = document.createElement("div");
-        bubble.classList.add("circle");
-        bubble.style.left = Math.random() * 100 + "vw";
-        bubble.style.animationDuration = Math.random() * 5 + 3 + "s";
-        bg.appendChild(bubble);
+    if (bg) {
+        for (let i = 0; i < 50; i++) {
+            let bubble = document.createElement("div");
+            bubble.classList.add("circle");
+            bubble.style.left = Math.random() * 100 + "vw";
+            bubble.style.animationDuration = Math.random() * 5 + 3 + "s";
+            bg.appendChild(bubble);
+        }
     }
 });
