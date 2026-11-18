@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>ExamCraft | Portal Sign In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="login.css">
     <script src="../security/Main.js"></script>
 </head>
@@ -13,33 +15,94 @@
         <div class="formbg"></div>
         <div class="form-container sign-in-container">
             <form id="signin">
+                <div class="portal-badge">
+                    <i class="fas fa-graduation-cap"></i> ExamCraft
+                </div>
+                <h1>Sign In</h1>
+                <p class="subtitle">Admin &amp; Teacher Question Paper Portal</p>
+
+                <!-- Quick-Fill Demo Chips -->
+                <div class="demo-pills-container">
+                    <span class="demo-label">Quick Demo Access:</span>
+                    <div class="demo-pills">
+                        <button type="button" class="demo-btn admin-btn" id="quickAdminBtn" title="Auto-fill Administrator credentials">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </button>
+                        <button type="button" class="demo-btn teacher-btn" id="quickTeacherBtn" title="Auto-fill Educator credentials">
+                            <i class="fas fa-chalkboard-teacher"></i> Teacher
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="login-username" placeholder="Username (e.g. Admin or Teacher)" required autocomplete="username">
+                </div>
                 
-                <h1>Sign in</h1>
-                <input type="text" id="login-username" placeholder="Username" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button type="submit">Sign In</button>
-                <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="login-password" placeholder="Password (e.g. 123456)" required autocomplete="current-password">
+                    <i class="fas fa-eye password-toggle" id="togglePasswordBtn" title="Toggle visibility"></i>
+                </div>
+
+                <button type="submit" id="submitBtn">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+
+                <div class="form-footer">
+                    <p class="forgot-password"><a href="#" id="forgot-password">Forgot Password?</a></p>
+                    <p class="home-link"><a href="../index.html"><i class="fas fa-home"></i> Back to Overview</a></p>
+                </div>
             </form>
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
     <script src="login.js"></script>
     
     <script>
-        // Animated Background Effect
-      
+        // Quick Fill Helper for Demo Credentials
+        document.getElementById('quickAdminBtn').addEventListener('click', () => {
+            document.getElementById('login-username').value = 'Admin';
+            document.getElementById('login-password').value = '123456';
+            highlightInputs();
+        });
+
+        document.getElementById('quickTeacherBtn').addEventListener('click', () => {
+            document.getElementById('login-username').value = 'Teacher';
+            document.getElementById('login-password').value = '123456';
+            highlightInputs();
+        });
+
+        function highlightInputs() {
+            const u = document.getElementById('login-username');
+            const p = document.getElementById('login-password');
+            u.classList.add('glow');
+            p.classList.add('glow');
+            setTimeout(() => {
+                u.classList.remove('glow');
+                p.classList.remove('glow');
+            }, 600);
+        }
+
+        // Password Show/Hide Toggle
+        const passInput = document.getElementById('login-password');
+        const passToggle = document.getElementById('togglePasswordBtn');
+        if (passToggle && passInput) {
+            passToggle.addEventListener('click', () => {
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    passToggle.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    passInput.type = 'password';
+                    passToggle.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        }
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-

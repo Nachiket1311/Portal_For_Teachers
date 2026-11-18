@@ -89,10 +89,16 @@ signinform.addEventListener("submit", (event) => {
 
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
+    const submitBtn = document.getElementById('submitBtn');
 
     if (!username || !password) {
         alert("Please provide both username and password.");
         return;
+    }
+
+    if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verifying...';
+        submitBtn.disabled = true;
     }
 
     // Check if the username exists and get the associated email
@@ -127,6 +133,7 @@ signinform.addEventListener("submit", (event) => {
                                         redirectUrl = `../mainteacher/teacher/dashboard.html?token=${idToken}`;
                                     } else {
                                         console.error('Unknown role:', role);
+                                        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
                                         return;
                                     }
 
@@ -136,16 +143,23 @@ signinform.addEventListener("submit", (event) => {
                             })
                             .catch((error) => {
                                 console.error('Error fetching user data:', error);
+                                if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
                             });
                     })
                     .catch((error) => {
                         console.error("Error signing in: ", error.message);
                         alert("Error: " + error.message);
+                        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
                     });
             });
         } else {
             alert('Username not found');
+            if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
         }
+    }).catch(err => {
+        console.error("Database lookup error:", err);
+        alert("Database connection error: " + err.message);
+        if (submitBtn) { submitBtn.innerHTML = 'Sign In'; submitBtn.disabled = false; }
     });
 });
 

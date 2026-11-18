@@ -3,68 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
-  <!-- Bootstrap CSS for styling -->
+  <title>Admin Dashboard | ExamCraft</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <script src="../../security/Main.js"></script>
 </head>
 <body>
   <div class="background-animation"></div>
+  
   <div class="container-fluid">
     <!-- Left Profile Sidebar -->
-    <div class="profile-sidebar">
-      <h2>Admin Profile</h2>
-      <ul>
-          <!-- Admin details will be dynamically inserted here -->
-          <li>Name: Admin</li>
-          <li>Email: admin@example.com</li>
-          <li>Role: Administrator</li>
-      </ul>
-      <button id="Logout" class="btn btn-primary">Log Out</button>
-    </div>
+    <aside class="profile-sidebar">
+      <div>
+        <div class="sidebar-header">
+          <div class="avatar-circle">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div>
+            <h2>Admin Portal</h2>
+            <span class="role-badge">System Administrator</span>
+          </div>
+        </div>
+
+        <ul id="adminProfileDetails">
+          <!-- Dynamic details populated by dashboard.js -->
+          <li><i class="fas fa-user"></i> Name: Admin</li>
+          <li><i class="fas fa-envelope"></i> Email: admin@example.com</li>
+          <li><i class="fas fa-shield-alt"></i> Role: Administrator</li>
+        </ul>
+      </div>
+
+      <button id="Logout" class="btn btn-logout">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </button>
+    </aside>
 
     <!-- Right Dashboard Section -->
-    <div class="dashboard-section">
-      <h2>Manage MCQs</h2>
-      <!-- Buttons for Bulk and Single MCQ Upload -->
-      <div class="btn-group mb-3">
-        <button class="btn btn-primary" id="uploadBulkBtn">Upload Bulk MCQs</button>
-        <button class="btn btn-primary" id="uploadBulkBtn-desc">Upload Bulk Descriptive Questions </button>
-        <button class="btn btn-primary" id="uploadimg">Upload Image Questions </button>
+    <main class="dashboard-section">
+      <div class="dashboard-title-bar">
+        <h1>
+          <i class="fas fa-tachometer-alt text-primary"></i>
+          Administrator Control Panel
+        </h1>
+        <span class="portal-tag">ExamCraft v1.0</span>
       </div>
 
-      <!-- Buttons/Hyperlinks for Users and Question Status -->
-      <div class="btn-status-group mb-3">
-        <h3>Total Users:</h3>
-        <button class="btn btn-info" id="totalUsersBtn">Total Users</button>
+      <div class="dashboard-grid">
+        <!-- Card 1: Question Ingestion -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>Question Ingestion</h3>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-action btn-upload-mcq" id="uploadBulkBtn">
+              <span><i class="fas fa-list-ol mr-2"></i> Upload Bulk MCQs</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="btn-action btn-upload-desc" id="uploadBulkBtn-desc">
+              <span><i class="fas fa-file-alt mr-2"></i> Upload Bulk Descriptive</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="btn-action btn-upload-img" id="uploadimg">
+              <span><i class="fas fa-image mr-2"></i> Upload Image Questions</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
 
-        <h3>MCQ Question Status:</h3>
-        <button class="btn btn-success" id="acceptedQuestionsBtn" onclick="accepted()">Accepted Questions</button>
-        <button class="btn btn-warning" id="pendingQuestionsBtn" onclick="pending()">Pending Questions</button>
-        <button class="btn btn-danger" id="rejectedQuestionsBtn" onclick="rejected()">Rejected Questions</button>
-        <button class="btn btn-secondary" id="totalQuestionsBtn" onclick="totalq()">Total Questions</button>
+        <!-- Card 2: User Role Management -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fas fa-users-cog"></i>
+            <h3>User Directory &amp; Roles</h3>
+          </div>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+            Oversee registered educator accounts, system roles, and account access permissions.
+          </p>
+          <div class="action-buttons">
+            <button class="btn-action btn-users" id="totalUsersBtn">
+              <span><i class="fas fa-users mr-2"></i> Total Users</span>
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+          </div>
+        </div>
 
+        <!-- Card 3: MCQ Question Moderation -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fas fa-check-double"></i>
+            <h3>MCQ Moderation Status</h3>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-action btn-status-accepted" id="acceptedQuestionsBtn" onclick="accepted()">
+              <span><i class="fas fa-check-circle mr-2"></i> Accepted Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-pending" id="pendingQuestionsBtn" onclick="pending()">
+              <span><i class="fas fa-clock mr-2"></i> Pending Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-rejected" id="rejectedQuestionsBtn" onclick="rejected()">
+              <span><i class="fas fa-times-circle mr-2"></i> Rejected Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-total" id="totalQuestionsBtn" onclick="totalq()">
+              <span><i class="fas fa-database mr-2"></i> Total MCQs</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
 
-        <h3> Descriptive Question Status:</h3>
-        <button class="btn btn-success" id="acceptedQuestionsBtndesc" onclick="accepteddesc()">Accepted Questions</button>
-        <button class="btn btn-warning" id="pendingQuestionsBtndesc" onclick="pendingdesc()">Pending Questions</button>
-        <button class="btn btn-danger" id="rejectedQuestionsBtndesc" onclick="rejecteddesc()">Rejected Questions</button>
-        <button class="btn btn-secondary" id="totalQuestionsBtndesc" onclick="totalqdesc()">Total Questions</button>
+        <!-- Card 4: Descriptive Question Moderation -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fas fa-tasks"></i>
+            <h3>Descriptive Moderation Status</h3>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-action btn-status-accepted" id="acceptedQuestionsBtndesc" onclick="accepteddesc()">
+              <span><i class="fas fa-check-circle mr-2"></i> Accepted Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-pending" id="pendingQuestionsBtndesc" onclick="pendingdesc()">
+              <span><i class="fas fa-clock mr-2"></i> Pending Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-rejected" id="rejectedQuestionsBtndesc" onclick="rejecteddesc()">
+              <span><i class="fas fa-times-circle mr-2"></i> Rejected Questions</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn-action btn-status-total" id="totalQuestionsBtndesc" onclick="totalqdesc()">
+              <span><i class="fas fa-database mr-2"></i> Total Descriptive</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 5: Curriculum Management -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fas fa-book-reader"></i>
+            <h3>Curriculum &amp; Syllabus</h3>
+          </div>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+            Configure academic standards, subjects, chapters, and topic breakdowns for paper blueprinting.
+          </p>
+          <div class="action-buttons">
+            <button class="btn-action btn-syllabus" id="manageChapterBtn" onclick="manageChapter()">
+              <span><i class="fas fa-layer-group mr-2"></i> Manage Syllabus &amp; Chapters</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
-
-      <!-- New Buttons for Managing Patterns, Chapters, and Standards -->
-      <div class="btn-management-group mb-3">
-        <h3>Manage Settings:</h3>
-        <!-- <button class="btn btn-outline-primary" id="managePatternBtn" onclick="managePattern()">Manage Question Paper Pattern</button> -->
-        <button class="btn btn-primary" id="manageChapterBtn" onclick="manageChapter()">Manage syllabus</button>
-      </div>
-    </div>
+    </main>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
   <script src="../js/dashboard.js"></script>
   
+  <script>
+    // Floating bubbles animation generator
+    document.addEventListener("DOMContentLoaded", () => {
+      const bg = document.querySelector(".background-animation");
+      if (bg) {
+        for (let i = 0; i < 28; i++) {
+          let bubble = document.createElement("div");
+          bubble.classList.add("circle");
+          bubble.style.left = Math.random() * 100 + "vw";
+          bubble.style.animationDuration = Math.random() * 5 + 4 + "s";
+          bg.appendChild(bubble);
+        }
+      }
+    });
+  </script>
 </body>
 </html>

@@ -93,13 +93,16 @@ function fetchAdminDetails() {
     }
 }
 
-// Function to update the sidebar with admin details
+// Function to update the sidebar with educator details
 function updateAdminSidebar(name, email, role) {
-    document.querySelector('.profile-sidebar ul').innerHTML = `
-        <li>Name: ${name}</li>
-        <li>Email: ${email}</li>
-        <li>Role: ${role}</li>
-    `;
+    const ul = document.querySelector('.profile-sidebar ul');
+    if (ul) {
+        ul.innerHTML = `
+            <li><i class="fas fa-user"></i> Name: ${name}</li>
+            <li><i class="fas fa-envelope"></i> Email: ${email}</li>
+            <li><i class="fas fa-id-badge"></i> Role: ${role}</li>
+        `;
+    }
 }
 
 // Call the function to fetch and display admin details
